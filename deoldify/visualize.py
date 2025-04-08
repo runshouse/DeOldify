@@ -88,10 +88,40 @@ class ModelImageVisualizer:
             watermarked=watermarked,
         )
 
+    # def plot_transformed_image(
+    #     self,
+    #     path: str,
+    #     results_dir:Path = None,
+    #     figsize: Tuple[int, int] = (20, 20),
+    #     render_factor: int = None,
+    #     display_render_factor: bool = False,
+    #     compare: bool = False,
+    #     post_process: bool = True,
+    #     watermarked: bool = True,
+    # ) -> Path:
+    #     path = Path(path)
+    #     if results_dir is None:
+    #         results_dir = Path(self.results_dir)
+    #     result = self.get_transformed_image(
+    #         path, render_factor, post_process=post_process,watermarked=watermarked
+    #     )
+    #     orig = self._open_pil_image(path)
+    #     if compare:
+    #         self._plot_comparison(
+    #             figsize, render_factor, display_render_factor, orig, result
+    #         )
+    #     else:
+    #         self._plot_solo(figsize, render_factor, display_render_factor, result)
+
+    #     orig.close()
+    #     result_path = self._save_result_image(path, result, results_dir=results_dir)
+    #     result.close()
+    #     return result_path
     def plot_transformed_image(
         self,
         path: str,
-        results_dir:Path = None,
+        results_dir: Path = None,
+        output_path: Path = None,
         figsize: Tuple[int, int] = (20, 20),
         render_factor: int = None,
         display_render_factor: bool = False,
@@ -103,18 +133,16 @@ class ModelImageVisualizer:
         if results_dir is None:
             results_dir = Path(self.results_dir)
         result = self.get_transformed_image(
-            path, render_factor, post_process=post_process,watermarked=watermarked
+            path, render_factor, post_process=post_process, watermarked=watermarked
         )
         orig = self._open_pil_image(path)
         if compare:
-            self._plot_comparison(
-                figsize, render_factor, display_render_factor, orig, result
-            )
+            self._plot_comparison(figsize, render_factor, display_render_factor, orig, result)
         else:
             self._plot_solo(figsize, render_factor, display_render_factor, result)
-
+    
         orig.close()
-        result_path = self._save_result_image(path, result, results_dir=results_dir)
+        result_path = self._save_result_image(path, result, results_dir=results_dir, output_path=output_path)
         result.close()
         return result_path
 
@@ -165,6 +193,17 @@ class ModelImageVisualizer:
         image.save(result_path)
         return result_path
 
+    def _save_result_image(self, source_path: Path, image: Image, results_dir=None, output_path: Path = None) -> Path:
+        if output_path is not None:
+            result_path = Path(output_path)
+        else:
+            if results_dir is None:
+                results_dir = Path(self.results_dir)
+            result_path = results_dir / source_path.name
+        image.save(result_path)
+        return result_path
+    
+        
     def get_transformed_image(
         self, path: Path, render_factor: int = None, post_process: bool = True,
         watermarked: bool = True,
